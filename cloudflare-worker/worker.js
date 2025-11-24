@@ -1,43 +1,69 @@
 /**
  * Xtream Codes API Cloudflare Worker
  * Stellt eine Xtream Codes API für M3U Playlists bereit
+ *
+ * HINWEIS: Credentials werden aus Environment Variables geladen (GitHub Secrets)
+ * Fallback auf hardcoded Werte wenn keine Env Variables gesetzt sind
  */
 
-// Konfiguration
-const CONFIG = {
-  // GitHub Raw URL zur playlist.m3u
+// Default Konfiguration (Fallback)
+const DEFAULT_CONFIG = {
   PLAYLIST_URL: 'https://raw.githubusercontent.com/Rosenweg/tv7/main/playlist.m3u',
-
-  // Gültige Credentials (ändern Sie diese!)
+  WORKER_URL: 'https://xtream-api.workers.dev',
   CREDENTIALS: [
     { username: 'user1', password: 'pass1' },
     { username: 'admin', password: 'secret123' }
-  ],
-
-  // Server Info
-  SERVER_INFO: {
-    url: 'https://your-worker.workers.dev',
-    port: '443',
-    https_port: '443',
-    server_protocol: 'https',
-    rtmp_port: '',
-    timezone: 'Europe/Zurich',
-    timestamp_now: Math.floor(Date.now() / 1000),
-    time_now: new Date().toISOString()
-  }
+  ]
 };
+
+/**
+ * Lädt Konfiguration aus Environment Variables oder verwendet Defaults
+ */
+function getConfig(env) {
+  // Playlist URL
+  const playlistUrl = env.PLAYLIST_URL || DEFAULT_CONFIG.PLAYLIST_URL;
+  const workerUrl = env.WORKER_URL || DEFAULT_CONFIG.WORKER_URL;
+
+  // Credentials: Versuche JSON aus Environment Variable zu parsen
+  let credentials = DEFAULT_CONFIG.CREDENTIALS;
+  if (env.CREDENTIALS) {
+    try {
+      credentials = JSON.parse(env.CREDENTIALS);
+    } catch (e) {
+      console.error('Failed to parse CREDENTIALS env var, using defaults');
+    }
+  }
+
+  return {
+    PLAYLIST_URL: playlistUrl,
+    CREDENTIALS: credentials,
+    SERVER_INFO: {
+      url: workerUrl,
+      port: '443',
+      https_port: '443',
+      server_protocol: 'https',
+      rtmp_port: '',
+      timezone: 'Europe/Zurich',
+      timestamp_now: Math.floor(Date.now() / 1000),
+      time_now: new Date().toISOString()
+    }
+  };
+}
 
 /**
  * Haupthandler für alle Requests
  */
-addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request));
-});
+export default {
+  async fetch(request, env, ctx) {
+    return handleRequest(request, env);
+  }
+};
 
 /**
  * Request Handler
  */
-async function handleRequest(request) {
+async function handleRequest(request, env) {
+  const CONFIG = getConfig(env);
   const url = new URL(request.url);
   const params = url.searchParams;
 
@@ -56,7 +82,7 @@ async function handleRequest(request) {
   const username = params.get('username');
   const password = params.get('password');
 
-  if (!authenticateUser(username, password)) {
+  if (!authenticateUser(username, password, CONFIG)) {
     return jsonResponse({ error: 'Invalid credentials' }, 401, corsHeaders);
   }
 
@@ -64,18 +90,18 @@ async function handleRequest(request) {
   const pathname = url.pathname;
 
   if (pathname.includes('player_api.php')) {
-    return handlePlayerAPI(params, corsHeaders);
+    return handlePlayerAPI(params, corsHeaders, CONFIG);
   } else if (pathname.includes('get.php')) {
-    return handleGetPlaylist(params, corsHeaders);
+    return handleGetPlaylist(params, corsHeaders, CONFIG);
   } else {
-    return htmlResponse(getWelcomePage(), corsHeaders);
+    return htmlResponse(getWelcomePage(CONFIG), corsHeaders);
   }
 }
 
 /**
  * Authentifizierung
  */
-function authenticateUser(username, password) {
+function authenticateUser(username, password, CONFIG) {
   return CONFIG.CREDENTIALS.some(
     cred => cred.username === username && cred.password === password
   );
@@ -84,7 +110,7 @@ function authenticateUser(username, password) {
 /**
  * Player API Handler
  */
-async function handlePlayerAPI(params, corsHeaders) {
+async function handlePlayerAPI(params, corsHeaders, CONFIG) {
   const action = params.get('action');
 
   if (!action) {
@@ -108,7 +134,7 @@ async function handlePlayerAPI(params, corsHeaders) {
   }
 
   // Lade M3U Playlist
-  const playlist = await fetchPlaylist();
+  const playlist = await fetchPlaylist(CONFIG);
   const streams = parseM3U(playlist);
 
   switch (action) {
@@ -138,12 +164,12 @@ async function handlePlayerAPI(params, corsHeaders) {
 /**
  * M3U Playlist Handler
  */
-async function handleGetPlaylist(params, corsHeaders) {
+async function handleGetPlaylist(params, corsHeaders, CONFIG) {
   const type = params.get('type') || 'm3u';
   const output = params.get('output') || 'ts';
 
   // Lade Original Playlist
-  const playlist = await fetchPlaylist();
+  const playlist = await fetchPlaylist(CONFIG);
 
   return new Response(playlist, {
     headers: {
@@ -157,7 +183,7 @@ async function handleGetPlaylist(params, corsHeaders) {
 /**
  * Lädt die M3U Playlist von GitHub
  */
-async function fetchPlaylist() {
+async function fetchPlaylist(CONFIG) {
   const response = await fetch(CONFIG.PLAYLIST_URL);
   if (!response.ok) {
     throw new Error('Failed to fetch playlist');
@@ -306,7 +332,7 @@ function htmlResponse(html, additionalHeaders = {}) {
 /**
  * Welcome Page
  */
-function getWelcomePage() {
+function getWelcomePage(CONFIG) {
   return `
 <!DOCTYPE html>
 <html>

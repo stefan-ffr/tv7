@@ -1,0 +1,61 @@
+name: Deploy Cloudflare Worker
+
+on:
+  # Manuell auslösbar
+  workflow_dispatch:
+
+  # Bei Push auf main branch (nur wenn Worker-Dateien geändert wurden)
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'cloudflare-worker/**'
+      - '.github/workflows/deploy-worker.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy to Cloudflare Workers
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Create wrangler.toml from template
+        run: |
+          cd cloudflare-worker
+          cat > wrangler.toml <<EOF
+          name = "xtream-api"
+          main = "worker.js"
+          compatibility_date = "2024-01-01"
+
+          [vars]
+          PLAYLIST_URL = "${{ secrets.PLAYLIST_URL || 'https://raw.githubusercontent.com/Rosenweg/tv7/main/playlist.m3u' }}"
+          WORKER_URL = "${{ secrets.WORKER_URL || 'https://xtream-api.workers.dev' }}"
+
+          # Credentials als verschlüsselte Secrets (JSON Array)
+          CREDENTIALS = "${{ secrets.XTREAM_CREDENTIALS }}"
+          EOF
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: cloudflare-worker
+          command: deploy
+
+      - name: Deployment Summary
+        run: |
+          echo "✅ Worker erfolgreich deployed!"
+          echo "🌍 URL: ${{ secrets.WORKER_URL || 'https://xtream-api.workers.dev' }}"
+          echo ""
+          echo "📝 IPTV Smarters Pro Setup:"
+          echo "   Server: ${{ secrets.WORKER_URL || 'https://xtream-api.workers.dev' }}"
+          echo "   Username/Password: (aus GitHub Secrets)"

@@ -18,7 +18,25 @@ Besuchen Sie [cloudflare.com](https://www.cloudflare.com/) und erstellen Sie ein
 
 ### 2. Worker deployen
 
-**Option A: Über Dashboard (Einfach)**
+**🎯 Option A: Mit GitHub Actions (EMPFOHLEN)**
+
+Vollautomatisches Deployment mit GitHub Secrets:
+
+1. Siehe [`GITHUB_SECRETS_SETUP.md`](GITHUB_SECRETS_SETUP.md) für detaillierte Anleitung
+2. Richten Sie 3 GitHub Secrets ein:
+   - `CLOUDFLARE_API_TOKEN`
+   - `CLOUDFLARE_ACCOUNT_ID`
+   - `XTREAM_CREDENTIALS` (JSON mit Username/Password)
+3. Pushen Sie zum `main` Branch oder lösen Sie den Workflow manuell aus
+4. Fertig! Worker wird automatisch deployed 🎉
+
+**Vorteile:**
+- ✅ Credentials als sichere GitHub Secrets
+- ✅ Automatisches Deployment bei Änderungen
+- ✅ Keine manuelle Konfiguration im Code
+- ✅ Einfaches Update der Credentials
+
+**Option B: Über Dashboard (Manuell)**
 
 1. Gehen Sie zu [Cloudflare Dashboard → Workers](https://dash.cloudflare.com/)
 2. Klicken Sie auf "Create a Service"
@@ -27,8 +45,9 @@ Besuchen Sie [cloudflare.com](https://www.cloudflare.com/) und erstellen Sie ein
 5. Klicken Sie auf "Quick Edit"
 6. Kopieren Sie den Inhalt von `worker.js` komplett
 7. Fügen Sie ihn ein und klicken Sie auf "Save and Deploy"
+8. **WICHTIG:** Passen Sie die Credentials in Zeile 10-16 an!
 
-**Option B: Mit Wrangler CLI (Fortgeschritten)**
+**Option C: Mit Wrangler CLI (Fortgeschritten)**
 
 ```bash
 # Wrangler installieren
@@ -225,27 +244,22 @@ wrangler deploy
 
 ### Auto-Deploy mit GitHub Actions
 
-Erstellen Sie `.github/workflows/deploy-worker.yml`:
+✅ **Bereits vorkonfiguriert!**
 
-```yaml
-name: Deploy Worker
+Der Workflow `.github/workflows/deploy-worker.yml` ist bereits im Repository vorhanden.
 
-on:
-  push:
-    branches: [main]
-    paths:
-      - 'cloudflare-worker/**'
+**Setup:**
+1. Siehe [`GITHUB_SECRETS_SETUP.md`](GITHUB_SECRETS_SETUP.md) für detaillierte Anleitung
+2. Konfigurieren Sie die erforderlichen GitHub Secrets
+3. Der Worker wird automatisch deployed bei:
+   - Push auf `main` Branch
+   - Änderungen in `cloudflare-worker/**`
+   - Manuellem Auslösen des Workflows
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          workingDirectory: cloudflare-worker
-```
+**Benötigte Secrets:**
+- `CLOUDFLARE_API_TOKEN` - API Token für Deployment
+- `CLOUDFLARE_ACCOUNT_ID` - Ihre Account ID
+- `XTREAM_CREDENTIALS` - Login-Daten als JSON Array
 
 ## 🌍 Alternative: Cloudflare Pages Functions
 
