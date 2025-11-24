@@ -6,6 +6,12 @@ init7:
   # Die offizielle Init7 M3U URL (mit rp=true für alle Kanäle)
   url: "https://api.init7.net/tvchannels.m3u?rp=true"
 
+# Lokale M3U-Quellen
+sources:
+  enabled: true
+  # Verzeichnis mit M3U-Dateien (alle *.m3u Dateien werden eingelesen)
+  directory: "sources"
+
 # go2rtc Streams
 go2rtc:
   enabled: true
