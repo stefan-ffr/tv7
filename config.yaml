@@ -12,6 +12,20 @@ sources:
   # Verzeichnis mit M3U-Dateien (alle *.m3u Dateien werden eingelesen)
   directory: "sources"
 
+# Xtream Codes API
+xtream:
+  enabled: false
+  # Server URL (ohne trailing slash)
+  server: "http://example.com:8080"
+  # Benutzername
+  username: "your_username"
+  # Passwort
+  password: "your_password"
+  # Welche Kategorien laden (live, vod, series)
+  include_live: true
+  include_vod: false
+  include_series: false
+
 # go2rtc Streams
 go2rtc:
   enabled: true

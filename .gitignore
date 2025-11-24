@@ -23,6 +23,12 @@ wheels/
 .installed.cfg
 *.egg
 
+# Node.js / Wrangler
+node_modules/
+package-lock.json
+.wrangler/
+wrangler.toml.local
+
 # IDE
 .vscode/
 .idea/

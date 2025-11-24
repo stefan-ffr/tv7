@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """
 M3U Playlist Generator
-Kombiniert Init7 TV Streams und go2rtc Streams zu einer M3U-Playlist
+Kombiniert Init7 TV Streams, Xtream Codes API und go2rtc Streams zu einer M3U-Playlist
 """
 
 import requests
 import yaml
 import sys
 import re
-from typing import List, Dict
+from typing import List, Dict, Optional
 from pathlib import Path
+from urllib.parse import urljoin
 
 
 class M3UEntry:
@@ -126,6 +127,75 @@ class PlaylistGenerator:
         if total_entries > 0:
             print(f"✓ {total_entries} Streams aus lokalen Quellen geladen")
 
+    def fetch_xtream_streams(self):
+        """Lädt Streams von einer Xtream Codes API"""
+        if not self.config.get('xtream', {}).get('enabled', False):
+            print("Xtream Codes API deaktiviert")
+            return
+
+        xtream_config = self.config['xtream']
+        server = xtream_config.get('server', '').rstrip('/')
+        username = xtream_config.get('username')
+        password = xtream_config.get('password')
+
+        if not all([server, username, password]):
+            print("⚠ Xtream Codes API: Server, Username oder Password fehlt")
+            return
+
+        print(f"Lade Xtream Codes API von {server}...")
+
+        try:
+            # Verwende die M3U-Export Funktion der Xtream API
+            # Format: server/get.php?username=X&password=Y&type=m3u_plus&output=ts
+            m3u_url = f"{server}/get.php"
+            params = {
+                'username': username,
+                'password': password,
+                'type': 'm3u_plus',
+                'output': 'ts'
+            }
+
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
+
+            response = requests.get(m3u_url, params=params, headers=headers, timeout=30)
+            response.raise_for_status()
+
+            # Parse M3U content
+            entries = self.parse_m3u(response.text)
+
+            # Optional: Filter nach Kategorien
+            include_live = xtream_config.get('include_live', True)
+            include_vod = xtream_config.get('include_vod', False)
+            include_series = xtream_config.get('include_series', False)
+
+            # Filtere Einträge (basierend auf group-title oder URL-Pattern)
+            filtered_entries = []
+            for entry in entries:
+                url_lower = entry.url.lower()
+
+                # Live Streams haben meist /live/ in der URL
+                is_live = '/live/' in url_lower or 'live' in entry.group_title.lower()
+                # VOD hat meist /movie/ in der URL
+                is_vod = '/movie/' in url_lower or 'movie' in entry.group_title.lower()
+                # Series haben meist /series/ in der URL
+                is_series = '/series/' in url_lower or 'series' in entry.group_title.lower()
+
+                if (include_live and is_live) or \
+                   (include_vod and is_vod) or \
+                   (include_series and is_series) or \
+                   (not is_live and not is_vod and not is_series):  # Fallback für unbekannte
+                    filtered_entries.append(entry)
+
+            self.entries.extend(filtered_entries)
+            print(f"✓ {len(filtered_entries)} Streams von Xtream API geladen")
+
+        except requests.RequestException as e:
+            print(f"⚠ Fehler beim Laden der Xtream API: {e}")
+        except Exception as e:
+            print(f"⚠ Fehler beim Verarbeiten der Xtream API: {e}")
+
     def parse_m3u(self, content: str) -> List[M3UEntry]:
         """Parst M3U Inhalt und gibt Einträge zurück"""
         entries = []
@@ -238,6 +308,7 @@ class PlaylistGenerator:
 
         self.fetch_init7_streams()
         self.load_source_files()
+        self.fetch_xtream_streams()
         self.add_go2rtc_streams()
         self.save_playlist()
 
