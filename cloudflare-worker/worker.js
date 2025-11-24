@@ -24,14 +24,30 @@ function getConfig(env) {
   const playlistUrl = env.PLAYLIST_URL || DEFAULT_CONFIG.PLAYLIST_URL;
   const workerUrl = env.WORKER_URL || DEFAULT_CONFIG.WORKER_URL;
 
-  // Credentials: Versuche JSON aus Environment Variable zu parsen
-  let credentials = DEFAULT_CONFIG.CREDENTIALS;
+  // Credentials: Flexible Konfiguration
+  let credentials = [];
+
+  // Option 1: Einzelner Benutzer über separate Secrets (EINFACHSTE METHODE)
+  if (env.XTREAM_USERNAME && env.XTREAM_PASSWORD) {
+    credentials.push({
+      username: env.XTREAM_USERNAME,
+      password: env.XTREAM_PASSWORD
+    });
+  }
+
+  // Option 2: Mehrere Benutzer über JSON Array
   if (env.CREDENTIALS) {
     try {
-      credentials = JSON.parse(env.CREDENTIALS);
+      const jsonCreds = JSON.parse(env.CREDENTIALS);
+      credentials = credentials.concat(jsonCreds);
     } catch (e) {
-      console.error('Failed to parse CREDENTIALS env var, using defaults');
+      console.error('Failed to parse CREDENTIALS env var, ignoring');
     }
+  }
+
+  // Fallback auf Default wenn keine Credentials gesetzt
+  if (credentials.length === 0) {
+    credentials = DEFAULT_CONFIG.CREDENTIALS;
   }
 
   return {

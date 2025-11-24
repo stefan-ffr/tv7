@@ -6,7 +6,21 @@ Dieses Dokument erklärt, wie Sie GitHub Secrets einrichten, um den Cloudflare W
 
 Gehen Sie zu Ihrem GitHub Repository → Settings → Secrets and variables → Actions → "New repository secret"
 
-### 1. CLOUDFLARE_API_TOKEN (Erforderlich)
+### 🎯 Einfache Methode (Ein Benutzer)
+
+Für die meisten Benutzer (nur ein Login):
+
+#### 1. XTREAM_USERNAME (Erforderlich)
+- Name: `XTREAM_USERNAME`
+- Value: `ihr-benutzername` (z.B. `familie`)
+
+#### 2. XTREAM_PASSWORD (Erforderlich)
+- Name: `XTREAM_PASSWORD`
+- Value: `ihr-passwort` (z.B. `geheim123`)
+
+### 🔧 Cloudflare Secrets
+
+#### 3. CLOUDFLARE_API_TOKEN (Erforderlich)
 
 **Was:** API Token für Cloudflare Worker Deployment
 
@@ -23,7 +37,7 @@ Gehen Sie zu Ihrem GitHub Repository → Settings → Secrets and variables → 
 - Name: `CLOUDFLARE_API_TOKEN`
 - Value: `Ihr-Cloudflare-API-Token`
 
-### 2. CLOUDFLARE_ACCOUNT_ID (Erforderlich)
+#### 4. CLOUDFLARE_ACCOUNT_ID (Erforderlich)
 
 **Was:** Ihre Cloudflare Account ID
 
@@ -37,9 +51,13 @@ Gehen Sie zu Ihrem GitHub Repository → Settings → Secrets and variables → 
 - Name: `CLOUDFLARE_ACCOUNT_ID`
 - Value: `Ihre-Account-ID` (z.B. `1234567890abcdef1234567890abcdef`)
 
-### 3. XTREAM_CREDENTIALS (Erforderlich)
+### 👥 Erweiterte Methode (Mehrere Benutzer) - Optional
 
-**Was:** Login-Daten für IPTV Smarters Pro (JSON Array)
+Falls Sie mehrere Logins benötigen:
+
+#### XTREAM_CREDENTIALS (Optional)
+
+**Was:** Zusätzliche Login-Daten als JSON Array
 
 **Format:** JSON Array mit Username/Password Objekten
 
@@ -50,14 +68,16 @@ Gehen Sie zu Ihrem GitHub Repository → Settings → Secrets and variables → 
 
 **In GitHub:**
 - Name: `XTREAM_CREDENTIALS`
-- Value: `[{"username":"IHR_USER","password":"IHR_PASSWORT"}]`
+- Value: `[{"username":"user2","password":"pass2"},{"username":"user3","password":"pass3"}]`
 
 **WICHTIG:**
 - Muss gültiges JSON sein (keine Zeilenumbrüche!)
-- Verwenden Sie starke Passwörter
-- Sie können mehrere Benutzer hinzufügen
+- Wird ZUSÄTZLICH zu XTREAM_USERNAME/PASSWORD verwendet
+- Oder alleine für mehrere Benutzer ohne XTREAM_USERNAME/PASSWORD
 
-### 4. WORKER_URL (Optional)
+### ⚙️ Optionale Secrets
+
+#### WORKER_URL (Optional)
 
 **Was:** Die öffentliche URL Ihres Workers
 
@@ -69,7 +89,7 @@ Gehen Sie zu Ihrem GitHub Repository → Settings → Secrets and variables → 
 
 **Standard:** Falls nicht gesetzt, wird `https://xtream-api.workers.dev` verwendet
 
-### 5. PLAYLIST_URL (Optional)
+#### PLAYLIST_URL (Optional)
 
 **Was:** URL zur M3U Playlist
 
@@ -83,11 +103,17 @@ Gehen Sie zu Ihrem GitHub Repository → Settings → Secrets and variables → 
 
 ## 📋 Zusammenfassung - Minimale Konfiguration
 
-Für ein funktionierendes Setup benötigen Sie **mindestens**:
+Für ein funktionierendes Setup benötigen Sie **mindestens diese 4 Secrets**:
 
-1. ✅ `CLOUDFLARE_API_TOKEN`
-2. ✅ `CLOUDFLARE_ACCOUNT_ID`
-3. ✅ `XTREAM_CREDENTIALS`
+1. ✅ `CLOUDFLARE_API_TOKEN` - API Token für Deployment
+2. ✅ `CLOUDFLARE_ACCOUNT_ID` - Ihre Cloudflare Account ID
+3. ✅ `XTREAM_USERNAME` - Ihr Login-Benutzername
+4. ✅ `XTREAM_PASSWORD` - Ihr Login-Passwort
+
+**Optional:**
+- `XTREAM_CREDENTIALS` - Für zusätzliche Benutzer (JSON Array)
+- `WORKER_URL` - Ihre Worker-URL (falls Custom Domain)
+- `PLAYLIST_URL` - Alternative M3U-Quelle
 
 ## 🚀 Deployment auslösen
 
@@ -153,9 +179,10 @@ Verwenden Sie diese Daten in der App:
 - ✅ Account ID im Cloudflare Dashboard überprüfen
 
 ### "Invalid credentials" in IPTV App
-- ❌ XTREAM_CREDENTIALS ist kein gültiges JSON
-- ✅ JSON-Format überprüfen (keine Zeilenumbrüche, richtige Quotes)
+- ❌ XTREAM_USERNAME oder XTREAM_PASSWORD falsch gesetzt
+- ✅ Username/Password in GitHub Secrets überprüfen
 - ✅ Username/Password in der App korrekt eingeben
+- ✅ Falls XTREAM_CREDENTIALS verwendet: JSON-Format überprüfen
 
 ### Worker deployed aber funktioniert nicht
 1. Gehen Sie zu Cloudflare Dashboard → Workers
@@ -166,15 +193,26 @@ Verwenden Sie diese Daten in der App:
 
 ## 📝 Beispiel-Konfiguration
 
-So sieht eine komplette Secrets-Konfiguration aus:
+### Einfache Konfiguration (1 Benutzer):
 
 | Secret Name | Value |
 |------------|-------|
 | CLOUDFLARE_API_TOKEN | `abc123...xyz789` |
 | CLOUDFLARE_ACCOUNT_ID | `1234567890abcdef...` |
-| XTREAM_CREDENTIALS | `[{"username":"familie","password":"geheim123"}]` |
-| WORKER_URL | `https://tv.meinedomain.com` |
-| PLAYLIST_URL | `https://raw.githubusercontent.com/Rosenweg/tv7/main/playlist.m3u` |
+| XTREAM_USERNAME | `familie` |
+| XTREAM_PASSWORD | `geheim123` |
+
+### Erweiterte Konfiguration (Mehrere Benutzer):
+
+| Secret Name | Value |
+|------------|-------|
+| CLOUDFLARE_API_TOKEN | `abc123...xyz789` |
+| CLOUDFLARE_ACCOUNT_ID | `1234567890abcdef...` |
+| XTREAM_USERNAME | `familie` |
+| XTREAM_PASSWORD | `geheim123` |
+| XTREAM_CREDENTIALS | `[{"username":"gast","password":"gast2024"},{"username":"freunde","password":"freunde123"}]` |
+| WORKER_URL | `https://tv.meinedomain.com` (optional) |
+| PLAYLIST_URL | `https://raw.githubusercontent.com/Rosenweg/tv7/main/playlist.m3u` (optional) |
 
 ## 🎉 Fertig!
 

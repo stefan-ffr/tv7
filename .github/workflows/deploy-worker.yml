@@ -39,7 +39,11 @@ jobs:
           PLAYLIST_URL = "${{ secrets.PLAYLIST_URL || 'https://raw.githubusercontent.com/Rosenweg/tv7/main/playlist.m3u' }}"
           WORKER_URL = "${{ secrets.WORKER_URL || 'https://xtream-api.workers.dev' }}"
 
-          # Credentials als verschlüsselte Secrets (JSON Array)
+          # Option 1: Einzelner Benutzer (EINFACH!)
+          XTREAM_USERNAME = "${{ secrets.XTREAM_USERNAME }}"
+          XTREAM_PASSWORD = "${{ secrets.XTREAM_PASSWORD }}"
+
+          # Option 2: Mehrere Benutzer (JSON Array, optional)
           CREDENTIALS = "${{ secrets.XTREAM_CREDENTIALS }}"
           EOF
 

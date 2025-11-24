@@ -23,10 +23,11 @@ Besuchen Sie [cloudflare.com](https://www.cloudflare.com/) und erstellen Sie ein
 Vollautomatisches Deployment mit GitHub Secrets:
 
 1. Siehe [`GITHUB_SECRETS_SETUP.md`](GITHUB_SECRETS_SETUP.md) für detaillierte Anleitung
-2. Richten Sie 3 GitHub Secrets ein:
-   - `CLOUDFLARE_API_TOKEN`
-   - `CLOUDFLARE_ACCOUNT_ID`
-   - `XTREAM_CREDENTIALS` (JSON mit Username/Password)
+2. Richten Sie 4 GitHub Secrets ein:
+   - `CLOUDFLARE_API_TOKEN` - API Token
+   - `CLOUDFLARE_ACCOUNT_ID` - Account ID
+   - `XTREAM_USERNAME` - Ihr Benutzername
+   - `XTREAM_PASSWORD` - Ihr Passwort
 3. Pushen Sie zum `main` Branch oder lösen Sie den Workflow manuell aus
 4. Fertig! Worker wird automatisch deployed 🎉
 
@@ -259,7 +260,9 @@ Der Workflow `.github/workflows/deploy-worker.yml` ist bereits im Repository vor
 **Benötigte Secrets:**
 - `CLOUDFLARE_API_TOKEN` - API Token für Deployment
 - `CLOUDFLARE_ACCOUNT_ID` - Ihre Account ID
-- `XTREAM_CREDENTIALS` - Login-Daten als JSON Array
+- `XTREAM_USERNAME` - Ihr Benutzername
+- `XTREAM_PASSWORD` - Ihr Passwort
+- `XTREAM_CREDENTIALS` - Optional: Zusätzliche Benutzer als JSON Array
 
 ## 🌍 Alternative: Cloudflare Pages Functions
 
