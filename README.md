@@ -4,7 +4,8 @@ Automatische Generierung einer kombinierten M3U-Playlist mit mehreren Quellen vi
 
 ## Features
 
-- ✅ **Xtream Codes API** - Integration von IPTV-Anbietern mit Xtream API
+- ✅ **Xtream Codes API Server** - Eigene API auf Cloudflare Workers (serverless & kostenlos!)
+- ✅ **Xtream Codes Client** - Integration von IPTV-Anbietern mit Xtream API
 - ✅ **Init7 TV** - Automatischer Import aller Init7 TV-Kanäle
 - ✅ **Lokale M3U-Dateien** - Beliebige M3U-Dateien aus `sources/` Ordner
 - ✅ **go2rtc Streams** - Integration eigener Streams
@@ -19,6 +20,10 @@ Automatische Generierung einer kombinierten M3U-Playlist mit mehreren Quellen vi
 ├── .github/
 │   └── workflows/
 │       └── generate-playlist.yml    # GitHub Actions Workflow
+├── cloudflare-worker/               # Xtream Codes API Server (Cloudflare Workers)
+│   ├── worker.js                    # Serverless API Implementation
+│   ├── wrangler.toml               # Worker Konfiguration
+│   └── README.md                    # Deployment-Anleitung
 ├── sources/                         # M3U-Quelldateien (beliebige *.m3u Dateien)
 │   ├── init7_channels.m3u          # Init7 TV Kanäle
 │   └── README.md                    # Dokumentation
@@ -98,17 +103,28 @@ Falls Sie go2rtc verwenden, können Sie zusätzliche Streams in der `config.yaml
 
 ## Playlist verwenden
 
-### Für IPTV Smarters Pro (Vidaa OS)
+### 🎯 Option 1: Xtream Codes API Server (EMPFOHLEN für Vidaa OS!)
 
-**Option 1: Xtream Codes API (direkt)**
-1. Öffnen Sie IPTV Smarters Pro
-2. Wählen Sie "Login with Xtream Codes API"
-3. Geben Sie Ihre Xtream-Daten ein (aus `config.yaml`)
+**Vorteile:**
+- ✅ Login mit Username/Password statt URL
+- ✅ Automatische Kategorisierung
+- ✅ Bessere User Experience in IPTV Apps
+- ✅ Komplett kostenlos (Cloudflare Workers)
 
-**Option 2: M3U Playlist URL**
-1. Öffnen Sie IPTV Smarters Pro
-2. Wählen Sie "Load Your Playlist or File/URL"
-3. Geben Sie die URL ein: `https://raw.githubusercontent.com/Rosenweg/tv7/main/playlist.m3u`
+**Setup:**
+1. Siehe [`cloudflare-worker/README.md`](cloudflare-worker/README.md) für Deployment
+2. Nach Deployment erhalten Sie eine URL: `https://xtream-api.ihre-subdomain.workers.dev`
+3. In IPTV Smarters Pro:
+   - Wählen Sie **"Login with Xtream Codes API"**
+   - Server: `https://xtream-api.ihre-subdomain.workers.dev`
+   - Username/Password: (wie in worker.js konfiguriert)
+
+### 📺 Option 2: M3U Playlist URL
+
+**Für alle IPTV Apps (VLC, Kodi, TiviMate, etc.)**
+
+1. In IPTV Smarters Pro: Wählen Sie "Load Your Playlist or File/URL"
+2. Geben Sie die URL ein: `https://raw.githubusercontent.com/Rosenweg/tv7/main/playlist.m3u`
 
 ### URL zur generierten Playlist
 
