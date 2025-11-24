@@ -67,23 +67,45 @@ class PlaylistGenerator:
             return
 
         url = self.config['init7'].get('url')
-        if not url:
-            print("Warnung: Init7 URL nicht konfiguriert")
-            return
+        local_file = self.config['init7'].get('local_file')
 
-        print(f"Lade Init7 Streams von {url}...")
-        try:
-            response = requests.get(url, timeout=30)
-            response.raise_for_status()
+        content = None
 
-            # Parse M3U content
-            content = response.text
+        # Versuche zuerst die URL
+        if url:
+            print(f"Lade Init7 Streams von {url}...")
+            try:
+                # User-Agent setzen, um 403-Fehler zu vermeiden
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                }
+                response = requests.get(url, headers=headers, timeout=30)
+                response.raise_for_status()
+                content = response.text
+                print(f"✓ Init7 Streams von API geladen")
+
+            except requests.RequestException as e:
+                print(f"⚠ Fehler beim Laden der Init7 Streams von API: {e}")
+
+        # Fallback auf lokale Datei
+        if content is None and local_file:
+            print(f"Versuche lokale Datei: {local_file}...")
+            try:
+                with open(local_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                print(f"✓ Init7 Streams von lokaler Datei geladen")
+            except FileNotFoundError:
+                print(f"⚠ Lokale Datei '{local_file}' nicht gefunden")
+            except Exception as e:
+                print(f"⚠ Fehler beim Lesen der lokalen Datei: {e}")
+
+        # Parse M3U content
+        if content:
             entries = self.parse_m3u(content)
             self.entries.extend(entries)
-            print(f"✓ {len(entries)} Init7 Streams geladen")
-
-        except requests.RequestException as e:
-            print(f"Fehler beim Laden der Init7 Streams: {e}")
+            print(f"✓ {len(entries)} Init7 Streams hinzugefügt")
+        else:
+            print("⚠ Keine Init7 Streams verfügbar")
 
     def parse_m3u(self, content: str) -> List[M3UEntry]:
         """Parst M3U Inhalt und gibt Einträge zurück"""

@@ -1,0 +1,39 @@
+#EXTM3U
+#EXTINF:-1 tvg-id="srf1.ch" tvg-name="SRF 1 FHD" tvg-logo="https://static.init7.net/tv/logos/srf1.png" group-title="🇨🇭 SRF",SRF 1 FHD
+https://srf-1-hls.akamaized.net/srf/stream/1/manifest.m3u8
+#EXTINF:-1 tvg-id="srfzwei.ch" tvg-name="SRF zwei FHD" tvg-logo="https://static.init7.net/tv/logos/srfzwei.png" group-title="🇨🇭 SRF",SRF zwei FHD
+https://srf-2-hls.akamaized.net/srf/stream/2/manifest.m3u8
+#EXTINF:-1 tvg-id="srfinfo.ch" tvg-name="SRF info FHD" tvg-logo="https://static.init7.net/tv/logos/srfinfo.png" group-title="🇨🇭 SRF",SRF info FHD
+https://srf-info-hls.akamaized.net/srf/stream/info/manifest.m3u8
+#EXTINF:-1 tvg-id="rts1.ch" tvg-name="RTS Un FHD" tvg-logo="https://static.init7.net/tv/logos/rts1.png" group-title="🇨🇭 RTS",RTS Un FHD
+https://rtsc3video.akamaized.net/hls/live/2042837/c3video/3/playlist.m3u8
+#EXTINF:-1 tvg-id="rts2.ch" tvg-name="RTS Deux FHD" tvg-logo="https://static.init7.net/tv/logos/rts2.png" group-title="🇨🇭 RTS",RTS Deux FHD
+https://rtsc3video.akamaized.net/hls/live/2042838/c3video/3/playlist.m3u8
+#EXTINF:-1 tvg-id="rsila1.ch" tvg-name="RSI LA 1 FHD" tvg-logo="https://static.init7.net/tv/logos/rsila1.png" group-title="🇨🇭 RSI",RSI LA 1 FHD
+https://rtsc3video.akamaized.net/hls/live/2042839/c3video/3/playlist.m3u8
+#EXTINF:-1 tvg-id="rsila2.ch" tvg-name="RSI LA 2 FHD" tvg-logo="https://static.init7.net/tv/logos/rsila2.png" group-title="🇨🇭 RSI",RSI LA 2 FHD
+https://rtsc3video.akamaized.net/hls/live/2042840/c3video/3/playlist.m3u8
+#EXTINF:-1 tvg-id="3plus.ch" tvg-name="3+ FHD" tvg-logo="https://static.init7.net/tv/logos/3plus.png" group-title="🇨🇭 Private",3+ FHD
+https://stream.init7.net/3plus/manifest.m3u8
+#EXTINF:-1 tvg-id="tv24.ch" tvg-name="TV24 FHD" tvg-logo="https://static.init7.net/tv/logos/tv24.png" group-title="🇨🇭 Private",TV24 FHD
+https://stream.init7.net/tv24/manifest.m3u8
+#EXTINF:-1 tvg-id="tv25.ch" tvg-name="TV25 FHD" tvg-logo="https://static.init7.net/tv/logos/tv25.png" group-title="🇨🇭 Private",TV25 FHD
+https://stream.init7.net/tv25/manifest.m3u8
+#EXTINF:-1 tvg-id="tele1.ch" tvg-name="Tele 1 FHD" tvg-logo="https://static.init7.net/tv/logos/tele1.png" group-title="🇨🇭 Regional",Tele 1 FHD
+https://stream.init7.net/tele1/manifest.m3u8
+#EXTINF:-1 tvg-id="telezueri.ch" tvg-name="Tele Züri FHD" tvg-logo="https://static.init7.net/tv/logos/telezueri.png" group-title="🇨🇭 Regional",Tele Züri FHD
+https://stream.init7.net/telezueri/manifest.m3u8
+#EXTINF:-1 tvg-id="telebielingue.ch" tvg-name="Tele Bielingue FHD" tvg-logo="https://static.init7.net/tv/logos/telebielingue.png" group-title="🇨🇭 Regional",Tele Bielingue FHD
+https://stream.init7.net/telebielingue/manifest.m3u8
+#EXTINF:-1 tvg-id="ard.de" tvg-name="Das Erste FHD" tvg-logo="https://static.init7.net/tv/logos/daserste.png" group-title="🇩🇪 Deutschland",Das Erste FHD
+https://stream.init7.net/daserste/manifest.m3u8
+#EXTINF:-1 tvg-id="zdf.de" tvg-name="ZDF FHD" tvg-logo="https://static.init7.net/tv/logos/zdf.png" group-title="🇩🇪 Deutschland",ZDF FHD
+https://stream.init7.net/zdf/manifest.m3u8
+#EXTINF:-1 tvg-id="orf1.at" tvg-name="ORF1 FHD" tvg-logo="https://static.init7.net/tv/logos/orf1.png" group-title="🇦🇹 Österreich",ORF1 FHD
+https://stream.init7.net/orf1/manifest.m3u8
+#EXTINF:-1 tvg-id="orf2.at" tvg-name="ORF2 FHD" tvg-logo="https://static.init7.net/tv/logos/orf2.png" group-title="🇦🇹 Österreich",ORF2 FHD
+https://stream.init7.net/orf2/manifest.m3u8
+#EXTINF:-1 tvg-name="Custom Stream 1" group-title="Custom",Custom Stream 1
+rtsp://example.com/stream1
+#EXTINF:-1 tvg-name="Custom Stream 2" group-title="Custom",Custom Stream 2
+rtsp://example.com/stream2
