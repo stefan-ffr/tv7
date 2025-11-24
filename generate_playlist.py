@@ -61,51 +61,70 @@ class PlaylistGenerator:
             sys.exit(1)
 
     def fetch_init7_streams(self):
-        """Lädt die Init7 TV Streams"""
+        """Lädt die Init7 TV Streams von der API"""
         if not self.config.get('init7', {}).get('enabled', False):
             print("Init7 Streams deaktiviert")
             return
 
         url = self.config['init7'].get('url')
-        local_file = self.config['init7'].get('local_file')
+        if not url:
+            print("Init7 URL nicht konfiguriert")
+            return
 
-        content = None
+        print(f"Lade Init7 Streams von {url}...")
+        try:
+            # User-Agent setzen, um 403-Fehler zu vermeiden
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            }
+            response = requests.get(url, headers=headers, timeout=30)
+            response.raise_for_status()
 
-        # Versuche zuerst die URL
-        if url:
-            print(f"Lade Init7 Streams von {url}...")
-            try:
-                # User-Agent setzen, um 403-Fehler zu vermeiden
-                headers = {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-                }
-                response = requests.get(url, headers=headers, timeout=30)
-                response.raise_for_status()
-                content = response.text
-                print(f"✓ Init7 Streams von API geladen")
-
-            except requests.RequestException as e:
-                print(f"⚠ Fehler beim Laden der Init7 Streams von API: {e}")
-
-        # Fallback auf lokale Datei
-        if content is None and local_file:
-            print(f"Versuche lokale Datei: {local_file}...")
-            try:
-                with open(local_file, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                print(f"✓ Init7 Streams von lokaler Datei geladen")
-            except FileNotFoundError:
-                print(f"⚠ Lokale Datei '{local_file}' nicht gefunden")
-            except Exception as e:
-                print(f"⚠ Fehler beim Lesen der lokalen Datei: {e}")
-
-        # Parse M3U content
-        if content:
-            entries = self.parse_m3u(content)
+            entries = self.parse_m3u(response.text)
             self.entries.extend(entries)
-            print(f"✓ {len(entries)} Init7 Streams hinzugefügt")
-        else:
-            print("⚠ Keine Init7 Streams verfügbar")
+            print(f"✓ {len(entries)} Init7 Streams von API geladen")
+
+        except requests.RequestException as e:
+            print(f"⚠ Fehler beim Laden der Init7 API: {e}")
+
+    def load_source_files(self):
+        """Lädt alle M3U-Dateien aus dem sources Verzeichnis"""
+        if not self.config.get('sources', {}).get('enabled', False):
+            print("Lokale Sources deaktiviert")
+            return
+
+        source_dir = self.config['sources'].get('directory', 'sources')
+        source_path = Path(source_dir)
+
+        if not source_path.exists():
+            print(f"⚠ Sources-Verzeichnis '{source_dir}' nicht gefunden")
+            return
+
+        # Finde alle M3U-Dateien
+        m3u_files = list(source_path.glob('*.m3u'))
+
+        if not m3u_files:
+            print(f"⚠ Keine M3U-Dateien in '{source_dir}' gefunden")
+            return
+
+        print(f"Lade M3U-Dateien aus '{source_dir}'...")
+        total_entries = 0
+
+        for m3u_file in sorted(m3u_files):
+            try:
+                with open(m3u_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+
+                entries = self.parse_m3u(content)
+                self.entries.extend(entries)
+                total_entries += len(entries)
+                print(f"  ✓ {m3u_file.name}: {len(entries)} Streams")
+
+            except Exception as e:
+                print(f"  ⚠ Fehler bei {m3u_file.name}: {e}")
+
+        if total_entries > 0:
+            print(f"✓ {total_entries} Streams aus lokalen Quellen geladen")
 
     def parse_m3u(self, content: str) -> List[M3UEntry]:
         """Parst M3U Inhalt und gibt Einträge zurück"""
@@ -218,6 +237,7 @@ class PlaylistGenerator:
         print("=" * 60)
 
         self.fetch_init7_streams()
+        self.load_source_files()
         self.add_go2rtc_streams()
         self.save_playlist()
 

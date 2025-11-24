@@ -17,6 +17,9 @@ Automatische Generierung einer kombinierten M3U-Playlist mit Init7 TV-Streams un
 ├── .github/
 │   └── workflows/
 │       └── generate-playlist.yml    # GitHub Actions Workflow
+├── sources/                         # M3U-Quelldateien (beliebige *.m3u Dateien)
+│   ├── init7_channels.m3u          # Init7 TV Kanäle
+│   └── README.md                    # Dokumentation
 ├── config.yaml                      # Konfigurationsdatei
 ├── generate_playlist.py             # Generator-Script
 ├── requirements.txt                 # Python-Dependencies
@@ -48,13 +51,25 @@ python generate_playlist.py
 
 Bearbeiten Sie `config.yaml` um die Playlist anzupassen:
 
-### Init7 Streams
+### Init7 Streams (API)
 
 ```yaml
 init7:
   enabled: true
   url: "https://api.init7.net/tvchannels.m3u?rp=true"
 ```
+
+**Hinweis:** Die Init7 API ist oft nur für Init7-Kunden erreichbar. Verwenden Sie stattdessen lokale M3U-Dateien im `sources/` Ordner.
+
+### Lokale M3U-Dateien
+
+```yaml
+sources:
+  enabled: true
+  directory: "sources"
+```
+
+Legen Sie beliebige `*.m3u` Dateien im `sources/` Verzeichnis ab. Alle Dateien werden automatisch eingelesen.
 
 ### go2rtc Streams hinzufügen
 
