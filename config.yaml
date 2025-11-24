@@ -1,0 +1,31 @@
+# Konfiguration für M3U Playlist Generator
+
+# Init7 TV Streams
+init7:
+  enabled: true
+  # Die offizielle Init7 M3U URL (mit rp=true für alle Kanäle)
+  url: "https://api.init7.net/tvchannels.m3u?rp=true"
+
+# go2rtc Streams
+go2rtc:
+  enabled: true
+  # Basis-URL für go2rtc Streams (anpassen an Ihre Installation)
+  base_url: "http://localhost:1984"
+  # Benutzerdefinierte Streams
+  streams:
+    - name: "Custom Stream 1"
+      url: "rtsp://example.com/stream1"
+      logo: ""
+      group: "Custom"
+    - name: "Custom Stream 2"
+      url: "rtsp://example.com/stream2"
+      logo: ""
+      group: "Custom"
+
+# Output-Konfiguration
+output:
+  filename: "playlist.m3u"
+  # Gruppierung aktivieren
+  use_groups: true
+  # TVG-Attribute hinzufügen
+  include_tvg: true

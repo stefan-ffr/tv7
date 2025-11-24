@@ -1,0 +1,69 @@
+name: Generate M3U Playlist
+
+on:
+  # Automatisch jeden Tag um 6:00 UTC ausführen
+  schedule:
+    - cron: '0 6 * * *'
+
+  # Manuell auslösbar
+  workflow_dispatch:
+
+  # Bei Push auf main branch
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'config.yaml'
+      - 'generate_playlist.py'
+      - '.github/workflows/generate-playlist.yml'
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Generate Playlist
+        run: |
+          python generate_playlist.py
+
+      - name: Check for Changes
+        id: changes
+        run: |
+          if git diff --quiet playlist.m3u; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and Push
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add playlist.m3u
+          git commit -m "Update playlist.m3u - $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          git push
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: playlist
+          path: playlist.m3u
+          retention-days: 30
