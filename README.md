@@ -124,14 +124,14 @@ Falls Sie go2rtc verwenden, können Sie zusätzliche Streams in der `config.yaml
 **Für alle IPTV Apps (VLC, Kodi, TiviMate, etc.)**
 
 1. In IPTV Smarters Pro: Wählen Sie "Load Your Playlist or File/URL"
-2. Geben Sie die URL ein: `https://raw.githubusercontent.com/Rosenweg/tv7/main/playlist.m3u`
+2. Geben Sie die URL ein: `https://raw.githubusercontent.com/stefan-ffr/tv7/main/playlist.m3u`
 
 ### URL zur generierten Playlist
 
 Die Playlist ist unter folgender URL verfügbar:
 
 ```
-https://raw.githubusercontent.com/Rosenweg/tv7/main/playlist.m3u
+https://raw.githubusercontent.com/stefan-ffr/tv7/main/playlist.m3u
 ```
 
 Diese URL funktioniert in allen IPTV-Apps (VLC, Kodi, TiviMate, etc.)
